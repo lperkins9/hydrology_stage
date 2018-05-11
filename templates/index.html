@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+    {% block content %}
+        <div class="jumbotron">
+          <h1 class="display-4">Welcom to the Stewart Hydrology Tool Kit!</h1>
+          <p class="lead">This app is designed to conduct calculations based on GIS data to automate stormater runnoff modeling.</p>
+          <hr class="my-4">
+          <p>Before getting started, read the instrions for documentation on the the file preparation that must be handled before running the program.</p>
+          <p class="lead">
+            <a class="btn btn-primary btn-lg" href="{% url 'gis_upload' %}" role="button">Hydrology Tool</a>
+          </p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="{% url 'instructions' %}" role="button">Instructions</a>
+            </p>
+        </div>
+    {% endblock %}

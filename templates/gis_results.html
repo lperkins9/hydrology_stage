@@ -2,4 +2,7 @@
 
 {% block content %}
     {{ table|safe }}
+    {% include "map.html" %}
+    <a class="btn btn-primary btn-lg" href= "{% url 'download_csv' %}" role="button">Download CSV</a>
+    <a class="btn btn-primary btn-lg" href= "{% url 'download_shp' %}" role="button">Download SHP</a>
 {% endblock %}

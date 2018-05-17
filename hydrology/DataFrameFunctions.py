@@ -6,9 +6,8 @@ from numpy import nan
 import folium
 import os
 import pyproj
-from selenium import webdriver
 import time
-
+from numpy import median
 
 def overlay_hydrology(delineationdf, imperviousdf, soils):
     imperviousdf.columns = ['SURFACE_TY','COVERAGE_T','geometry']
@@ -56,8 +55,34 @@ def overlay_hydrology(delineationdf, imperviousdf, soils):
     Drainage_Areas_CSV.to_csv('hydrology/output/Drainage_Areas.csv')
     return Drainage_Areas_CSV.round(decimals=0)
 
+
+def create_overall_map(delineationdf, imperviousdf):
+    delineationdf.crs = {'init':'epsg:2264'}
+    imperviousdf.crs = {'init':'epsg:2264'}
+    def convert(x, y):
+        state_plane = pyproj.Proj(init='EPSG:2264', preserve_units=True)
+        wgs = pyproj.Proj(proj='latlong', datum='WGS84', ellps='WGS84')
+        lng, lat = pyproj.transform(state_plane, wgs, x, y)
+        return lat, lng 
     
-#def create_map(union):
+    x_list = []
+    y_list = []
+    for index, row in delineationdf.iterrows():    
+        x_item = row['geometry'].centroid.x
+        y_item = row['geometry'].centroid.y
+        x_list.append(x_item)
+        y_list.append(y_item)
+        
+    point = convert([median(x_list)],[median(y_list)])
+    
+    x = point[0][0]
+    y = point[1][0]
+    mp = folium.Map(location=[x,y], zoom_start=30)
+    folium.GeoJson(delineationdf, style_function = lambda x :{'fillColor': 'green','opacity':100}).add_to(mp)
+    folium.GeoJson(imperviousdf, style_function = lambda x :{'fillColor': 'black','opacity':100}).add_to(mp)
+    mp.save('templates/map.html')
+    
+#def create_structure_map(union):
 #    plot_union = union.dropna()
 #    check = []
 #    struc = []

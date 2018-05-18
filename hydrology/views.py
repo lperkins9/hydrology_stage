@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import os
+import io
 from geopandas import datasets, GeoDataFrame, read_file, overlay
 from hydrology.functions import zip_to_df
 from hydrology.DataFrameFunctions import overlay_hydrology, create_overall_map
@@ -46,15 +47,14 @@ def download_csv(request):
             return response
         
 def download_shp(request):
-    zf = zipfile.ZipFile('hydrology/output/drainage_area_shp.zip', mode = 'w')
-    zf.write('hydrology/output/Drainage_Areas.cpg')
-    zf.write('hydrology/output/Drainage_Areas.dbf')
-    zf.write('hydrology/output/Drainage_Areas.shp')
-    zf.write('hydrology/output/Drainage_Areas.shx')
+    filenames = ['hydrology/output/Drainage_Areas.cpg','hydrology/output/Drainage_Areas.dbf','hydrology/output/Drainage_Areas.shp','hydrology/output/Drainage_Areas.shx']
     
-    file_path = 'hydrology/output/drainage_area_shp.zip'
-    wrapper = FileWrapper(file_path)
-    if os.path.exists(file_path):
-            response = HttpResponse(wrapper, content_type="application/zip")
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-            return response
+    zip_subdir = "hydrology/output/"
+    zip_filename = "{}/Drainage_Areas.zip".format(zip_subdir)
+
+    response = HttpResponse(content_type='application/zip')
+    zip_file = zipfile.ZipFile(response, 'w')
+    for filename in filenames:
+        zip_file.write(filename)
+    response['Content-Disposition'] = 'attachment; filename={}'.format('Drainage_Areas_shp.zip')
+    return response
